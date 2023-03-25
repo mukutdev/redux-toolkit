@@ -1,13 +1,13 @@
 const {createSlice, createAsyncThunk} = require("@reduxjs/toolkit")
 const fetch = require("node-fetch")
 
-const intialState = {
+const initialState = {
     loading : false,
     videos : {},
     error : ""
 }
 
-const fetchVideos = createAsyncThunk(("post/fetchPost" , async()=>{
+const fetchVideos = (createAsyncThunk("post/fetchPost" , async ()=>{
     const response = await fetch("http://localhost:9000/videos")
     const videos = await response.json()
     return videos;
@@ -16,7 +16,7 @@ const fetchVideos = createAsyncThunk(("post/fetchPost" , async()=>{
 
 const videoSlice = createSlice({
     name : "videos",
-    intialState,
+    initialState,
     extraReducers : (builder)=>{
         builder.addCase(fetchVideos.pending , (state , action)=>{
             state.loading = true,
