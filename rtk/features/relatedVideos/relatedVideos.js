@@ -9,13 +9,13 @@ const initialState = {
 } 
 
 
-const fetchRelatedVideos = createAsyncThunk("videos/fetchRelatedVideos" , async(tags)=>{
+const fetchRelatedVideos = createAsyncThunk("relatedVideos/fetchRelatedVideos" , async(tags)=>{
 
     const queryString = tags.reduce((queryString , currentTag)=>{
         if(!queryString){
             queryString += `tags_like=${currentTag}`
         }else{
-            queryString += `tags_like=${currentTag}`
+            queryString += `&tags_like=${currentTag}`
         }
         return queryString;
     } , "")
@@ -31,17 +31,18 @@ const relatedVideosSlice = createSlice({
     extraReducers : (builder)=>{
         builder.addCase(fetchRelatedVideos.pending , (state , action) =>{
             state.loading = true,
-            state.error = action.message.error
+            state.error = ""
         })
         builder.addCase(fetchRelatedVideos.fulfilled , (state , action) =>{
-            state.loading = true,
-            state.videos = action.payload,
-            state.error = action.message.error
+            state.loading = false,
+            state.videos = action.payload.length > 0 ?
+                           action.payload.sort((a , b) => parseFloat(b.views) - parseFloat(a.views)) : []
+            state.error = ""
         })
-        builder.addCase(fetchRelatedVideos.pending , (state , action) =>{
-            state.loading = true,
+        builder.addCase(fetchRelatedVideos.rejected , (state , action) =>{
+            state.loading = false,
             state.videos = []
-            state.error = action.message.error
+            state.error = action.error.message
         })
     }
 })
